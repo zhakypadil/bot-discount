@@ -328,7 +328,6 @@ bot.action(/feedback_(.+)/, customerHandlers.handleFeedbackCallback);
 
 // Business flow callbacks
 bot.action('set_prices', businessHandlers.handleSetPricesCallback);
-bot.action(/price_(.+)_(.+)/, businessHandlers.handlePriceCallback);
 bot.action('set_time', businessHandlers.handleSetTimeCallback);
 bot.action(/time_(.+)/, businessHandlers.handleTimeCallback);
 bot.action(/mark_(.+)/, businessHandlers.handleStatusCallback);
@@ -343,6 +342,18 @@ bot.on('text', async (ctx) => {
         await businessHandlers.handleBusinessRegistration(ctx);
     } else if (ctx.session?.feedbackStep === 'message') {
         await customerHandlers.handleFeedbackSubmission(ctx);
+    } else if (ctx.session?.priceInputStep && ['small', 'medium', 'large'].includes(ctx.session.priceInputStep)) {
+        await businessHandlers.handlePriceInput(ctx);
+    } else {
+        // Check if user is a registered business and show dashboard
+        const Business = require('./models/Business');
+        const business = await Business.findOne({ 
+            where: { telegramId: ctx.from.id.toString() } 
+        });
+        
+        if (business) {
+            await businessHandlers.showBusinessDashboard(ctx, business, ctx.session?.language || 'en');
+        }
     }
 });
 

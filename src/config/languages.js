@@ -22,7 +22,7 @@ const languages = {
         registrationFailed: "❌ Registration failed. Please try again.",
         
         // Business dashboard
-        businessDashboard: "🏪 Business Dashboard\n\nName: {name}\nAddress: {address}\nPhone: {phone}\nStatus: {status}\n\nSmall Box Price: ${smallPrice}\nMedium Box Price: ${mediumPrice}\nLarge Box Price: ${largePrice}\nSales Time: {time}",
+        businessDashboard: "🏪 Business Dashboard\n\nName: {name}\nAddress: {address}\nPhone: {phone}\nStatus: {status}\n\nSmall Box Price: {smallPrice} ₸\nMedium Box Price: {mediumPrice} ₸\nLarge Box Price: {largePrice} ₸\nSales Time: {time}",
         active: "🟢 Active",
         inactive: "🔴 Inactive",
         setPrices: "Set Box Prices",
@@ -33,10 +33,15 @@ const languages = {
         
         // Price and time settings
         setBoxPrices: "Select prices for your mystery boxes:",
+        enterSmallBoxPrice: "💰 Please enter the price for Small Box (in tenge):\n\nEnter a number (e.g., 1000)",
+        enterMediumBoxPrice: "💰 Please enter the price for Medium Box (in tenge):\n\nEnter a number (e.g., 1500)",
+        enterLargeBoxPrice: "💰 Please enter the price for Large Box (in tenge):\n\nEnter a number (e.g., 2000)",
+        invalidPrice: "❌ Invalid price. Please enter a valid number.",
         setSalesTime: "Select the time when you'll have mystery boxes available:",
         pricesUpdated: "✅ Prices updated successfully!",
         salesTimeUpdated: "✅ Sales time updated to {time}!",
         statusUpdated: "✅ Status updated to {status}!",
+        notSet: "Not set",
         
         // Customer interest
         customerInterestSummary: "📊 Customer Interest Summary\n\n",
@@ -56,7 +61,7 @@ const languages = {
         // Customer browsing
         availableBusinesses: "Available businesses in {city}:",
         noBusinessesAvailable: "No businesses are currently active in {city}.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Sales Time: {time}\n\nSmall Box: ${smallPrice}\nMedium Box: ${mediumPrice}\nLarge Box: {largePrice}",
+        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Sales Time: {time}\n\nSmall Box: {smallPrice} ₸\nMedium Box: {mediumPrice} ₸\nLarge Box: {largePrice} ₸",
         selectBoxSize: "Select box size:",
         interestRecorded: "✅ Your interest has been recorded! The business will contact you.",
         alreadyInterested: "You have already expressed interest in this business.",
@@ -99,7 +104,7 @@ const languages = {
         registrationFailed: "❌ Регистрация не удалась. Пожалуйста, попробуйте снова.",
         
         // Business dashboard
-        businessDashboard: "🏪 Панель управления бизнесом\n\nНазвание: {name}\nАдрес: {address}\nТелефон: {phone}\nСтатус: {status}\n\nЦена маленькой коробки: ${smallPrice}\nЦена средней коробки: ${mediumPrice}\nЦена большой коробки: ${largePrice}\nВремя продаж: {time}",
+        businessDashboard: "🏪 Панель управления бизнесом\n\nНазвание: {name}\nАдрес: {address}\nТелефон: {phone}\nСтатус: {status}\n\nЦена маленькой коробки: {smallPrice} ₸\nЦена средней коробки: {mediumPrice} ₸\nЦена большой коробки: {largePrice} ₸\nВремя продаж: {time}",
         active: "🟢 Активен",
         inactive: "🔴 Неактивен",
         setPrices: "Установить цены коробок",
@@ -110,10 +115,15 @@ const languages = {
         
         // Price and time settings
         setBoxPrices: "Выберите цены для ваших таинственных коробок:",
+        enterSmallBoxPrice: "💰 Пожалуйста, введите цену для маленькой коробки (в тенге):\n\nВведите число (например, 1000)",
+        enterMediumBoxPrice: "💰 Пожалуйста, введите цену для средней коробки (в тенге):\n\nВведите число (например, 1500)",
+        enterLargeBoxPrice: "💰 Пожалуйста, введите цену для большой коробки (в тенге):\n\nВведите число (например, 2000)",
+        invalidPrice: "❌ Неверная цена. Пожалуйста, введите действительное число.",
         setSalesTime: "Выберите время, когда у вас будут доступны таинственные коробки:",
         pricesUpdated: "✅ Цены успешно обновлены!",
         salesTimeUpdated: "✅ Время продаж обновлено на {time}!",
         statusUpdated: "✅ Статус обновлен на {status}!",
+        notSet: "Не установлено",
         
         // Customer interest
         customerInterestSummary: "📊 Сводка интереса клиентов\n\n",
@@ -133,7 +143,7 @@ const languages = {
         // Customer browsing
         availableBusinesses: "Доступные предприятия в {city}:",
         noBusinessesAvailable: "В {city} в настоящее время нет активных предприятий.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Время продаж: {time}\n\nМаленькая коробка: ${smallPrice}\nСредняя коробка: ${mediumPrice}\nБольшая коробка: {largePrice}",
+        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Время продаж: {time}\n\nМаленькая коробка: {smallPrice} ₸\nСредняя коробка: {mediumPrice} ₸\nБольшая коробка: {largePrice} ₸",
         selectBoxSize: "Выберите размер коробки:",
         interestRecorded: "✅ Ваш интерес зафиксирован! Предприятие свяжется с вами.",
         alreadyInterested: "Вы уже выразили интерес к этому предприятию.",
@@ -176,7 +186,7 @@ const languages = {
         registrationFailed: "❌ Тіркеу сәтсіз болды. Қайталап көріңіз.",
         
         // Business dashboard
-        businessDashboard: "🏪 Кәсіпорын басқару панелі\n\nАтауы: {name}\nМекенжай: {address}\nТелефон: {phone}\nКүйі: {status}\n\nКіші қорап бағасы: ${smallPrice}\nОрта қорап бағасы: ${mediumPrice}\nҮлкен қорап бағасы: ${largePrice}\nСату уақыты: {time}",
+        businessDashboard: "🏪 Кәсіпорын басқару панелі\n\nАтауы: {name}\nМекенжай: {address}\nТелефон: {phone}\nКүйі: {status}\n\nКіші қорап бағасы: {smallPrice} ₸\nОрта қорап бағасы: {mediumPrice} ₸\nҮлкен қорап бағасы: {largePrice} ₸\nСату уақыты: {time}",
         active: "🟢 Белсенді",
         inactive: "🔴 Белсенді емес",
         setPrices: "Қорап бағаларын орнату",
@@ -187,10 +197,15 @@ const languages = {
         
         // Price and time settings
         setBoxPrices: "Жұмбақ қораптарыңыздың бағаларын таңдаңыз:",
+        enterSmallBoxPrice: "💰 Кіші қораптың бағасын енгізіңіз (тенге):\n\nСан енгізіңіз (мысалы, 1000)",
+        enterMediumBoxPrice: "💰 Орта қораптың бағасын енгізіңіз (тенге):\n\nСан енгізіңіз (мысалы, 1500)",
+        enterLargeBoxPrice: "💰 Үлкен қораптың бағасын енгізіңіз (тенге):\n\nСан енгізіңіз (мысалы, 2000)",
+        invalidPrice: "❌ Жалған баға. Нақты санды енгізіңіз.",
         setSalesTime: "Жұмбақ қораптарыңыз қолжетімді болатын уақытты таңдаңыз:",
         pricesUpdated: "✅ Бағалар сәтті жаңартылды!",
         salesTimeUpdated: "✅ Сату уақыты {time} деп жаңартылды!",
         statusUpdated: "✅ Күй {status} деп жаңартылды!",
+        notSet: "Орнатылмаған",
         
         // Customer interest
         customerInterestSummary: "📊 Тұтынушы қызығушылығының қорытындысы\n\n",
@@ -210,7 +225,7 @@ const languages = {
         // Customer browsing
         availableBusinesses: "{city} қаласындағы қолжетімді кәсіпорындар:",
         noBusinessesAvailable: "{city} қаласында әзірше белсенді кәсіпорындар жоқ.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Сату уақыты: {time}\n\nКіші қорап: ${smallPrice}\nОрта қорап: ${mediumPrice}\nҮлкен қорап: {largePrice}",
+        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Сату уақыты: {time}\n\nКіші қорап: {smallPrice} ₸\nОрта қорап: {mediumPrice} ₸\nҮлкен қорап: {largePrice} ₸",
         selectBoxSize: "Қорап өлшемін таңдаңыз:",
         interestRecorded: "✅ Сіздің қызығушылығыңыз тіркелді! Кәсіпорын сізбен байланысады.",
         alreadyInterested: "Сіз бұл кәсіпорынға қызығушылық білдіргенсіз.",

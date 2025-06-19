@@ -115,9 +115,6 @@ async function showBusinessDashboard(ctx, business, lang) {
         ],
         [
             Markup.button.callback(getText(lang, 'viewInterests'), 'view_interests')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'backToMain'), 'back_to_main')
         ]
     ]);
 
@@ -126,68 +123,86 @@ async function showBusinessDashboard(ctx, business, lang) {
         address: business.address,
         phone: business.phone,
         status: business.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
-        smallPrice: business.smallPrice,
-        mediumPrice: business.mediumPrice,
-        largePrice: business.largePrice,
-        time: business.salesTime
+        smallPrice: business.smallPrice || 0,
+        mediumPrice: business.mediumPrice || 0,
+        largePrice: business.largePrice || 0,
+        time: business.salesTime || getText(lang, 'notSet')
     }), keyboard);
 }
 
 // Set prices callback
 async function handleSetPricesCallback(ctx) {
     const lang = ctx.session?.language || 'en';
-    const keyboard = Markup.inlineKeyboard([
-        [
-            Markup.button.callback('$5', 'price_small_5'),
-            Markup.button.callback('$10', 'price_small_10'),
-            Markup.button.callback('$15', 'price_small_15')
-        ],
-        [
-            Markup.button.callback('$8', 'price_medium_8'),
-            Markup.button.callback('$12', 'price_medium_12'),
-            Markup.button.callback('$18', 'price_medium_18')
-        ],
-        [
-            Markup.button.callback('$12', 'price_large_12'),
-            Markup.button.callback('$18', 'price_large_18'),
-            Markup.button.callback('$25', 'price_large_25')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
-        ]
-    ]);
-
+    
+    // Set session to expect price input for small box
+    ctx.session.priceInputStep = 'small';
+    
     await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'setBoxPrices'), keyboard);
+    await ctx.editMessageText(getText(lang, 'enterSmallBoxPrice'));
 }
 
-// Price selection callback
-async function handlePriceCallback(ctx) {
-    const [_, size, price] = ctx.callbackQuery.data.split('_');
+// Handle manual price input
+async function handlePriceInput(ctx) {
     const telegramId = ctx.from.id.toString();
     const lang = ctx.session?.language || 'en';
+    const input = ctx.message.text;
+    const step = ctx.session.priceInputStep;
+    
+    // Check if input is a valid price format (number)
+    const price = parseFloat(input);
+    if (isNaN(price) || price < 0) {
+        await ctx.reply(getText(lang, 'invalidPrice'));
+        return;
+    }
     
     try {
         const business = await Business.findOne({ where: { telegramId } });
         if (!business) {
-            await ctx.answerCbQuery(getText(lang, 'businessNotFound'));
+            await ctx.reply(getText(lang, 'businessNotFound'));
             return;
         }
         
-        const updateData = {};
-        updateData[`${size}Price`] = parseFloat(price);
-        
-        await business.update(updateData);
-        
-        await ctx.answerCbQuery(getText(lang, 'pricesUpdated'));
-        await ctx.editMessageText(getText(lang, 'pricesUpdated'));
-        
-        // Show updated dashboard
-        await showBusinessDashboard(ctx, business, lang);
+        switch (step) {
+            case 'small':
+                // Store small price and ask for medium
+                ctx.session.smallPrice = price;
+                ctx.session.priceInputStep = 'medium';
+                await ctx.reply(getText(lang, 'enterMediumBoxPrice'));
+                break;
+                
+            case 'medium':
+                // Store medium price and ask for large
+                ctx.session.mediumPrice = price;
+                ctx.session.priceInputStep = 'large';
+                await ctx.reply(getText(lang, 'enterLargeBoxPrice'));
+                break;
+                
+            case 'large':
+                // Store large price and update all prices
+                ctx.session.largePrice = price;
+                
+                await business.update({
+                    smallPrice: ctx.session.smallPrice,
+                    mediumPrice: ctx.session.mediumPrice,
+                    largePrice: price
+                });
+                
+                // Clear session
+                delete ctx.session.priceInputStep;
+                delete ctx.session.smallPrice;
+                delete ctx.session.mediumPrice;
+                delete ctx.session.largePrice;
+                
+                await ctx.reply(getText(lang, 'pricesUpdated'));
+                
+                // Show updated dashboard
+                await showBusinessDashboard(ctx, business, lang);
+                break;
+        }
         
     } catch (error) {
         console.error('Price update error:', error);
-        await ctx.answerCbQuery(getText(lang, 'error'));
+        await ctx.reply(getText(lang, 'error'));
     }
 }
 
@@ -204,9 +219,6 @@ async function handleSetTimeCallback(ctx) {
             Markup.button.callback('20:00', 'time_20:00'),
             Markup.button.callback('21:00', 'time_21:00'),
             Markup.button.callback('22:00', 'time_22:00')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
         ]
     ]);
 
@@ -304,14 +316,8 @@ async function handleViewInterestsCallback(ctx) {
             });
         }
         
-        const keyboard = Markup.inlineKeyboard([
-            [
-                Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
-            ]
-        ]);
-        
         await ctx.answerCbQuery();
-        await ctx.editMessageText(message, keyboard);
+        await ctx.editMessageText(message);
         
     } catch (error) {
         console.error('View interests error:', error);
@@ -344,7 +350,7 @@ module.exports = {
     handleBusinessRegistration,
     showBusinessDashboard,
     handleSetPricesCallback,
-    handlePriceCallback,
+    handlePriceInput,
     handleSetTimeCallback,
     handleTimeCallback,
     handleStatusCallback,
