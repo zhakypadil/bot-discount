@@ -188,20 +188,34 @@ async function handleCustomerCallback(ctx) {
     
     if (existingCustomer) {
         // Show customer menu
+        await ctx.answerCbQuery();
         await handleCustomerMenu(ctx, lang);
         return;
     }
     
-    // Start customer registration
-    await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'welcomeCustomer'));
-    
-    // Set session state for customer registration
-    ctx.session.registrationType = 'customer';
-    ctx.session.registrationStep = 'name';
-    
-    // Ask for customer name
-    await ctx.reply('Please enter your name:');
+    // Create customer automatically using Telegram data
+    try {
+        const customerName = ctx.from.first_name || ctx.from.username || 'Customer';
+        
+        const customer = await Customer.create({
+            telegramId: telegramId,
+            name: customerName,
+            language: lang,
+            city: city
+        });
+        
+        await ctx.answerCbQuery();
+        await ctx.editMessageText(getText(lang, 'customerRegistrationSuccess', {
+            name: customerName
+        }));
+        
+        // Show customer menu
+        await handleCustomerMenu(ctx, lang);
+        
+    } catch (error) {
+        console.error('Customer registration error:', error);
+        await ctx.answerCbQuery(getText(lang, 'registrationFailed'));
+    }
 }
 
 // Customer menu handler
@@ -222,17 +236,41 @@ async function handleCustomerMenu(ctx, lang) {
 // Help callback
 async function handleHelpCallback(ctx) {
     const lang = ctx.session?.language || 'en';
-    const adminPhone = process.env.ADMIN_PHONE || '+1234567890';
     
     await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'helpInfo', { phone: adminPhone }));
+    await ctx.editMessageText(getText(lang, 'helpInfo'));
 }
 
 // Back to main menu callback
 async function handleBackToMainCallback(ctx) {
     const lang = ctx.session?.language || 'en';
+    const telegramId = ctx.from.id.toString();
+    
     await ctx.answerCbQuery();
-    await handleMainMenu(ctx, lang);
+    
+    // Check if user is already registered as business or customer
+    const existingBusiness = await Business.findOne({ where: { telegramId } });
+    const existingCustomer = await Customer.findOne({ where: { telegramId } });
+    
+    if (existingBusiness) {
+        // Show business dashboard
+        await ctx.editMessageText(getText(lang, 'businessDashboard', {
+            name: existingBusiness.name,
+            address: existingBusiness.address,
+            phone: existingBusiness.phone,
+            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
+            smallPrice: existingBusiness.smallPrice,
+            mediumPrice: existingBusiness.mediumPrice,
+            largePrice: existingBusiness.largePrice,
+            time: existingBusiness.salesTime
+        }));
+    } else if (existingCustomer) {
+        // Show customer menu
+        await handleCustomerMenu(ctx, lang);
+    } else {
+        // Show main menu for new users
+        await handleMainMenu(ctx, lang);
+    }
 }
 
 // Refresh callback
@@ -269,7 +307,10 @@ async function handleViewBusinessesCallback(ctx) {
     
     if (businesses.length === 0) {
         await ctx.answerCbQuery();
-        await ctx.editMessageText(getText(lang, 'noBusinessesAvailable'));
+        await ctx.editMessageText(getText(lang, 'noBusinessesAvailable', { city: getCityName(city, lang) }));
+        
+        // Show customer menu again
+        await handleCustomerMenu(ctx, lang);
         return;
     }
     
@@ -280,7 +321,7 @@ async function handleViewBusinessesCallback(ctx) {
     );
     
     await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'availableBusinesses'), keyboard);
+    await ctx.editMessageText(getText(lang, 'availableBusinesses', { city: getCityName(city, lang) }), keyboard);
 }
 
 module.exports = {

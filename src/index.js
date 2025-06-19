@@ -341,8 +341,6 @@ bot.on('text', async (ctx) => {
     
     if (registrationType === 'business') {
         await businessHandlers.handleBusinessRegistration(ctx);
-    } else if (registrationType === 'customer') {
-        await customerHandlers.handleCustomerRegistration(ctx);
     } else if (ctx.session?.feedbackStep === 'message') {
         await customerHandlers.handleFeedbackSubmission(ctx);
     }

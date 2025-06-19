@@ -5,49 +5,6 @@ const Interest = require('../models/Interest');
 const Feedback = require('../models/Feedback');
 const { getText } = require('./mainHandlers');
 
-// Customer registration flow
-async function handleCustomerRegistration(ctx) {
-    const telegramId = ctx.from.id.toString();
-    const lang = ctx.session?.language || 'en';
-    const city = ctx.session?.city;
-    
-    if (!lang || !city) {
-        await ctx.reply('Please complete language and city selection first');
-        return;
-    }
-    
-    const step = ctx.session.registrationStep;
-    
-    switch (step) {
-        case 'name':
-            const name = ctx.message.text;
-            
-            try {
-                // Create customer
-                const customer = await Customer.create({
-                    telegramId: telegramId,
-                    name: name,
-                    language: lang,
-                    city: city
-                });
-                
-                // Clear session
-                delete ctx.session.registrationType;
-                delete ctx.session.registrationStep;
-                
-                await ctx.reply(getText(lang, 'welcomeCustomer'));
-                
-                // Show customer menu
-                await showCustomerMenu(ctx, lang);
-                
-            } catch (error) {
-                console.error('Customer registration error:', error);
-                await ctx.reply(getText(lang, 'error'));
-            }
-            break;
-    }
-}
-
 // Show customer menu
 async function showCustomerMenu(ctx, lang) {
     const keyboard = Markup.inlineKeyboard([
@@ -272,7 +229,6 @@ async function handleFeedbackSubmission(ctx) {
 }
 
 module.exports = {
-    handleCustomerRegistration,
     showCustomerMenu,
     handleViewBusinessesCallback,
     handleBusinessSelectionCallback,
