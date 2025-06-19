@@ -1,0 +1,299 @@
+const { Markup } = require('telegraf');
+const { languages, cities } = require('../config/languages');
+const Business = require('../models/Business');
+const Customer = require('../models/Customer');
+
+// Helper function to get text in user's language
+function getText(lang, key, replacements = {}) {
+    const text = languages[lang]?.[key] || languages['en'][key] || key;
+    return Object.keys(replacements).reduce((result, key) => {
+        return result.replace(`{${key}}`, replacements[key]);
+    }, text);
+}
+
+// Helper function to get city name in user's language
+function getCityName(cityKey, lang) {
+    return cities[cityKey]?.[lang] || cityKey;
+}
+
+// Helper function to get all city names in user's language
+function getCityOptions(lang) {
+    return Object.keys(cities).map(cityKey => ({
+        text: getCityName(cityKey, lang),
+        callback_data: `city_${cityKey}`
+    }));
+}
+
+// Language selection handler
+async function handleLanguageSelection(ctx) {
+    const keyboard = Markup.inlineKeyboard([
+        [
+            Markup.button.callback('🇺🇸 English', 'lang_en'),
+            Markup.button.callback('🇷🇺 Русский', 'lang_ru')
+        ],
+        [
+            Markup.button.callback('🇰🇿 Қазақша', 'lang_kk')
+        ]
+    ]);
+
+    await ctx.reply(getText('en', 'selectLanguage'), keyboard);
+}
+
+// City selection handler
+async function handleCitySelection(ctx, lang) {
+    const cityOptions = getCityOptions(lang);
+    const keyboard = Markup.inlineKeyboard(
+        cityOptions.map(city => [Markup.button.callback(city.text, city.callback_data)])
+    );
+
+    await ctx.reply(getText(lang, 'selectCity'), keyboard);
+}
+
+// Main menu handler
+async function handleMainMenu(ctx, lang = 'en') {
+    const keyboard = Markup.inlineKeyboard([
+        [
+            Markup.button.callback(getText(lang, 'business'), 'business'),
+            Markup.button.callback(getText(lang, 'customer'), 'customer')
+        ],
+        [
+            Markup.button.callback(getText(lang, 'help'), 'help')
+        ]
+    ]);
+
+    await ctx.reply(getText(lang, 'welcome'), keyboard);
+}
+
+// Start command handler
+async function handleStart(ctx) {
+    const telegramId = ctx.from.id.toString();
+    
+    // Check if user already exists
+    const existingBusiness = await Business.findOne({ where: { telegramId } });
+    const existingCustomer = await Customer.findOne({ where: { telegramId } });
+    
+    if (existingBusiness) {
+        // User is a business, show business dashboard
+        const lang = existingBusiness.language;
+        await ctx.reply(getText(lang, 'businessDashboard', {
+            name: existingBusiness.name,
+            address: existingBusiness.address,
+            phone: existingBusiness.phone,
+            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
+            smallPrice: existingBusiness.smallPrice,
+            mediumPrice: existingBusiness.mediumPrice,
+            largePrice: existingBusiness.largePrice,
+            time: existingBusiness.salesTime
+        }));
+        return;
+    }
+    
+    if (existingCustomer) {
+        // User is a customer, show customer menu
+        const lang = existingCustomer.language;
+        await handleCustomerMenu(ctx, lang);
+        return;
+    }
+    
+    // New user - start with language selection
+    await handleLanguageSelection(ctx);
+}
+
+// Language selection callback
+async function handleLanguageCallback(ctx) {
+    const lang = ctx.callbackQuery.data.split('_')[1];
+    const telegramId = ctx.from.id.toString();
+    
+    // Store language in session
+    ctx.session = ctx.session || {};
+    ctx.session.language = lang;
+    
+    await ctx.answerCbQuery(getText(lang, 'languageSelected'));
+    await ctx.editMessageText(getText(lang, 'languageSelected'));
+    
+    // Proceed to city selection
+    await handleCitySelection(ctx, lang);
+}
+
+// City selection callback
+async function handleCityCallback(ctx) {
+    const cityKey = ctx.callbackQuery.data.split('_')[1];
+    const lang = ctx.session?.language || 'en';
+    const telegramId = ctx.from.id.toString();
+    
+    // Store city in session
+    ctx.session = ctx.session || {};
+    ctx.session.city = cityKey;
+    
+    const cityName = getCityName(cityKey, lang);
+    await ctx.answerCbQuery(getText(lang, 'citySelected') + ' ' + cityName);
+    await ctx.editMessageText(getText(lang, 'citySelected') + ' ' + cityName);
+    
+    // Show main menu
+    await handleMainMenu(ctx, lang);
+}
+
+// Business callback
+async function handleBusinessCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    const city = ctx.session?.city;
+    
+    if (!lang || !city) {
+        await ctx.answerCbQuery('Please complete registration first');
+        return;
+    }
+    
+    // Check if business already exists
+    const telegramId = ctx.from.id.toString();
+    const existingBusiness = await Business.findOne({ where: { telegramId } });
+    
+    if (existingBusiness) {
+        // Show business dashboard
+        await ctx.answerCbQuery();
+        await ctx.editMessageText(getText(lang, 'businessDashboard', {
+            name: existingBusiness.name,
+            address: existingBusiness.address,
+            phone: existingBusiness.phone,
+            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
+            smallPrice: existingBusiness.smallPrice,
+            mediumPrice: existingBusiness.mediumPrice,
+            largePrice: existingBusiness.largePrice,
+            time: existingBusiness.salesTime
+        }));
+        return;
+    }
+    
+    // Start business registration
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'businessRegistration'));
+    
+    // Set session state for business registration
+    ctx.session.registrationType = 'business';
+    ctx.session.registrationStep = 'code';
+}
+
+// Customer callback
+async function handleCustomerCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    const city = ctx.session?.city;
+    
+    if (!lang || !city) {
+        await ctx.answerCbQuery('Please complete registration first');
+        return;
+    }
+    
+    // Check if customer already exists
+    const telegramId = ctx.from.id.toString();
+    const existingCustomer = await Customer.findOne({ where: { telegramId } });
+    
+    if (existingCustomer) {
+        // Show customer menu
+        await handleCustomerMenu(ctx, lang);
+        return;
+    }
+    
+    // Start customer registration
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'welcomeCustomer'));
+    
+    // Set session state for customer registration
+    ctx.session.registrationType = 'customer';
+    ctx.session.registrationStep = 'name';
+    
+    // Ask for customer name
+    await ctx.reply('Please enter your name:');
+}
+
+// Customer menu handler
+async function handleCustomerMenu(ctx, lang) {
+    const keyboard = Markup.inlineKeyboard([
+        [
+            Markup.button.callback(getText(lang, 'viewBusinesses'), 'view_businesses'),
+            Markup.button.callback(getText(lang, 'refresh'), 'refresh')
+        ],
+        [
+            Markup.button.callback(getText(lang, 'backToMain'), 'back_to_main')
+        ]
+    ]);
+
+    await ctx.reply(getText(lang, 'welcomeCustomer'), keyboard);
+}
+
+// Help callback
+async function handleHelpCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    const adminPhone = process.env.ADMIN_PHONE || '+1234567890';
+    
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'helpInfo', { phone: adminPhone }));
+}
+
+// Back to main menu callback
+async function handleBackToMainCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    await ctx.answerCbQuery();
+    await handleMainMenu(ctx, lang);
+}
+
+// Refresh callback
+async function handleRefreshCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    const city = ctx.session?.city;
+    
+    if (!city) {
+        await ctx.answerCbQuery('Please complete registration first');
+        return;
+    }
+    
+    await ctx.answerCbQuery();
+    await handleCustomerMenu(ctx, lang);
+}
+
+// View businesses callback
+async function handleViewBusinessesCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    const city = ctx.session?.city;
+    
+    if (!city) {
+        await ctx.answerCbQuery('Please complete registration first');
+        return;
+    }
+    
+    // Get active businesses in the same city
+    const businesses = await Business.findAll({
+        where: {
+            isActive: true,
+            city: city
+        }
+    });
+    
+    if (businesses.length === 0) {
+        await ctx.answerCbQuery();
+        await ctx.editMessageText(getText(lang, 'noBusinessesAvailable'));
+        return;
+    }
+    
+    const keyboard = Markup.inlineKeyboard(
+        businesses.map(business => [
+            Markup.button.callback(business.name, `business_${business.id}`)
+        ])
+    );
+    
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'availableBusinesses'), keyboard);
+}
+
+module.exports = {
+    handleStart,
+    handleLanguageCallback,
+    handleCityCallback,
+    handleBusinessCallback,
+    handleCustomerCallback,
+    handleHelpCallback,
+    handleBackToMainCallback,
+    handleRefreshCallback,
+    handleViewBusinessesCallback,
+    handleCustomerMenu,
+    getText,
+    getCityName
+}; 
