@@ -19,10 +19,7 @@ async function handleBusinessRegistration(ctx) {
     
     switch (step) {
         case 'code':
-            await ctx.reply(getText(lang, 'enterBusinessCode'));
-            break;
-            
-        case 'name':
+            // Process the code that was just entered
             const code = ctx.message.text;
             const businessCode = await BusinessCode.findOne({ 
                 where: { 
@@ -48,19 +45,19 @@ async function handleBusinessRegistration(ctx) {
             await ctx.reply(getText(lang, 'codeValid'));
             break;
             
-        case 'address':
+        case 'name':
             ctx.session.businessName = ctx.message.text;
             ctx.session.registrationStep = 'address';
             await ctx.reply(getText(lang, 'businessAddress'));
             break;
             
-        case 'phone':
+        case 'address':
             ctx.session.businessAddress = ctx.message.text;
             ctx.session.registrationStep = 'phone';
             await ctx.reply(getText(lang, 'contactPhone'));
             break;
             
-        case 'complete':
+        case 'phone':
             const phone = ctx.message.text;
             
             try {
