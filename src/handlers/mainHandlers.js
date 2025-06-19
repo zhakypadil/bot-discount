@@ -163,6 +163,9 @@ async function handleBusinessCallback(ctx) {
         return;
     }
     
+    // Get admin phone number from environment
+    const adminPhone = process.env.ADMIN_PHONE || '+7 (777) 123-45-67';
+    
     // Start business registration with manual code entry
     await ctx.answerCbQuery();
     await ctx.editMessageText(getText(lang, 'businessRegistration'));
@@ -170,6 +173,12 @@ async function handleBusinessCallback(ctx) {
     // Set session state for business registration
     ctx.session.registrationType = 'business';
     ctx.session.registrationStep = 'code';
+    
+    // Show instructions and admin contact
+    await ctx.reply(getText(lang, 'businessCodeInstructions', { phone: adminPhone }));
+    
+    // Prompt for business code
+    await ctx.reply(getText(lang, 'enterBusinessCode'));
 }
 
 // Customer callback

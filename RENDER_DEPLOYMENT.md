@@ -76,6 +76,7 @@ Make sure your code is pushed to GitHub with these files:
    BOT_TOKEN=your_telegram_bot_token_here
    DATABASE_URL=your_postgres_connection_string_from_step_4
    ADMIN_IDS=your_telegram_user_id_from_step_2
+   ADMIN_PHONE=your_phone_number_for_business_contact
    NODE_ENV=production
    ```
 
