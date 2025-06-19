@@ -9,11 +9,7 @@ const { getText } = require('./mainHandlers');
 async function showCustomerMenu(ctx, lang) {
     const keyboard = Markup.inlineKeyboard([
         [
-            Markup.button.callback(getText(lang, 'viewBusinesses'), 'view_businesses'),
-            Markup.button.callback(getText(lang, 'refresh'), 'refresh')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'backToMain'), 'back_to_main')
+            Markup.button.callback(getText(lang, 'viewBusinesses'), 'view_businesses')
         ]
     ]);
 
@@ -80,9 +76,6 @@ async function handleBusinessSelectionCallback(ctx) {
             ],
             [
                 Markup.button.callback(getText(lang, 'leaveFeedback'), `feedback_${businessId}`)
-            ],
-            [
-                Markup.button.callback(getText(lang, 'backToMain'), 'back_to_main')
             ]
         ]);
         
@@ -235,4 +228,4 @@ module.exports = {
     handleInterestCallback,
     handleFeedbackCallback,
     handleFeedbackSubmission
-}; 
+};
