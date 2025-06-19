@@ -163,7 +163,7 @@ async function handleBusinessCallback(ctx) {
         return;
     }
     
-    // Start business registration with auto-generated code
+    // Start business registration with manual code entry
     await ctx.answerCbQuery();
     await ctx.editMessageText(getText(lang, 'businessRegistration'));
     

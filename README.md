@@ -1,196 +1,172 @@
-# Mystery Box Bot
+# Telegram Bot for Food Business Mystery Boxes
 
-A Telegram bot-based SaaS app for food businesses to sell unsold end-of-day products in mystery boxes. The bot supports multiple languages (English, Russian, Kazakh) and city-based filtering.
+A Telegram bot-based SaaS application that helps food businesses sell unsold end-of-day products in mystery boxes to customers. The system supports two user types: businesses and customers, with multi-language support (English, Russian, Kazakh) and city-based filtering.
 
 ## Features
 
-### Multi-Language Support
-- **English, Russian, and Kazakh** languages
-- Users select their preferred language during registration
-- All user-facing text is localized
-- Easy to add more languages
-
-### City-Based Filtering
-- **Almaty and Astana** currently supported
-- Businesses and customers are filtered by city
-- Users only see businesses and customers from their city
-- Easy to add more cities
-
 ### For Businesses
-- **Automatic registration** with auto-generated business codes
-- Set prices for small/medium/large mystery boxes
-- Set sales start time
-- Mark active/inactive status
-- View customer interest counts
-- Receive customer feedback
+- **Registration**: Businesses must contact the administrator to receive a unique registration code
+- **Profile Management**: Set business name, address, and contact information
+- **Pricing Control**: Set prices for small, medium, and large mystery boxes
+- **Availability Management**: Toggle active/inactive status and set sales time
+- **Customer Interest Tracking**: View customer interest in their mystery boxes
+- **Multi-language Support**: Interface available in English, Russian, and Kazakh
 
 ### For Customers
-- Browse available businesses in their city
-- View mystery box prices and timing
-- Express interest in box sizes
-- Leave feedback for businesses
-- Real-time updates
+- **Registration**: Simple registration with name and phone number
+- **Browse Businesses**: View available businesses in their city
+- **Express Interest**: Show interest in specific box sizes
+- **Feedback System**: Rate and comment on mystery box experiences
+- **City Filtering**: Only see businesses in their selected city
 
-## Tech Stack
+### For Administrators
+- **Code Management**: Generate and distribute business registration codes
+- **System Statistics**: View business and customer statistics
+- **Code Tracking**: Monitor used, available, and expired codes
+- **User Management**: View registered businesses and customers
+- **Feedback Monitoring**: Review customer feedback and ratings
 
-- **Node.js** with Express
-- **Telegraf** for Telegram Bot API
-- **PostgreSQL** database
-- **Sequelize** ORM
-- **Render** for deployment
+## System Architecture
 
-## Setup
+### Database Schema
+- **Businesses**: Store business information, pricing, and status
+- **BusinessCodes**: Auto-generated codes with expiration dates
+- **Customers**: Customer registration and preferences
+- **Interests**: Track customer interest in specific businesses
+- **Feedback**: Customer ratings and comments
+
+### Code Generation System
+- **Auto-generation**: Codes are automatically generated in the database
+- **Admin Distribution**: Administrators generate codes and distribute them to businesses
+- **Security**: Businesses must contact admin to receive registration codes
+- **Expiration**: Codes expire after 1 year for security
+- **Unique Format**: BUS + timestamp + random string (e.g., BUS123456ABC)
+
+## Setup Instructions
 
 ### Prerequisites
-- Node.js 16+
+- Node.js (v14 or higher)
 - PostgreSQL database
-- Telegram Bot Token
+- Telegram Bot Token (from @BotFather)
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd bot-discount
-```
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd bot-discount
+   ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. Create environment file:
-```bash
-cp env.example .env
-```
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env
+   ```
+   
+   Edit `.env` with your configuration:
+   ```env
+   BOT_TOKEN=your_telegram_bot_token
+   DATABASE_URL=postgresql://username:password@localhost:5432/bot_discount
+   ADMIN_IDS=123456789,987654321
+   ```
 
-4. Configure environment variables:
-```env
-BOT_TOKEN=your_telegram_bot_token
-DATABASE_URL=your_postgresql_connection_string
-NODE_ENV=development
-ADMIN_PHONE=+1234567890
-```
+4. **Set up the database**
+   ```bash
+   npm run setup
+   ```
 
-5. Run database setup:
-```bash
-npm run setup
-```
+5. **Generate initial business codes (Admin only)**
+   ```bash
+   npm run admin
+   ```
+   Use the `/admin` command in Telegram to generate codes
 
-6. Start the bot:
+### Running the Application
+
+**Development:**
 ```bash
-# Development
 npm run dev
+```
 
-# Production
+**Production:**
+```bash
 npm start
-```
-
-## Adding New Cities
-
-To add a new city, use the provided script:
-
-```bash
-node scripts/add-city.js <cityKey> <englishName> <russianName> <kazakhName>
-```
-
-Example:
-```bash
-node scripts/add-city.js shymkent "Shymkent" "Шымкент" "Шымкент"
-```
-
-Then update the `cities` object in `src/config/languages.js` to make it permanent.
-
-## Adding New Languages
-
-To add a new language:
-
-1. Add the language code to the `languages` object in `src/config/languages.js`
-2. Add the language to the `language` field ENUM in database models
-3. Update the language selection UI in `mainHandlers.js`
-
-## Database Schema
-
-### Businesses
-- `id` - Primary key
-- `telegram_id` - Telegram user ID
-- `name` - Business name
-- `address` - Business address
-- `phone` - Contact phone
-- `small_price`, `medium_price`, `large_price` - Box prices
-- `sales_time` - Sales start time
-- `is_active` - Active status
-- `language` - User's language preference
-- `city` - Business city
-
-### Customers
-- `id` - Primary key
-- `telegram_id` - Telegram user ID
-- `name` - Customer name
-- `language` - User's language preference
-- `city` - Customer city
-
-### Interests
-- `id` - Primary key
-- `customer_id` - Customer reference
-- `business_id` - Business reference
-- `box_size` - Box size (small/medium/large)
-
-### Feedback
-- `id` - Primary key
-- `customer_id` - Customer reference
-- `business_id` - Business reference
-- `message` - Feedback message
-
-### Business Codes
-- `id` - Primary key
-- `code` - Auto-generated business registration code
-- `is_used` - Whether code has been used
-- `used_by` - Business ID that used the code
-- `expires_at` - Code expiration date (1 year from creation)
-
-## Business Code System
-
-The bot automatically generates unique business codes when users register as businesses:
-
-- **Format**: `BUS` + timestamp + random string (e.g., `BUS123456ABC`)
-- **Validity**: 1 year from generation
-- **Uniqueness**: Each code is guaranteed to be unique
-- **Automatic Assignment**: Codes are automatically assigned to the registering business
-
-## Deployment
-
-### Render Deployment
-
-1. Connect your repository to Render
-2. Set environment variables in Render dashboard
-3. Deploy using the provided `render.yaml`
-
-### Environment Variables for Production
-
-```env
-BOT_TOKEN=your_telegram_bot_token
-DATABASE_URL=your_postgresql_connection_string
-NODE_ENV=production
-WEBHOOK_URL=https://your-app.onrender.com/webhook
-ADMIN_PHONE=+1234567890
 ```
 
 ## Admin Panel
 
-Access the admin panel to manage the system:
+The admin panel is accessible via Telegram commands for authorized administrators:
 
+### Commands
+- `/admin` - Access the admin panel
+
+### Features
+- **Statistics**: View system-wide statistics
+- **Business Management**: View registered businesses
+- **Customer Management**: View registered customers
+- **Code Generation**: Generate new business codes (5, 10, or 20 at a time)
+- **Code Management**: View available, used, and expired codes
+- **Feedback Review**: Monitor customer feedback
+
+### Setting Up Admin Access
+1. Get your Telegram user ID
+2. Add it to the `ADMIN_IDS` environment variable (comma-separated for multiple admins)
+3. Restart the bot
+4. Use `/admin` command in Telegram
+
+## Business Registration Flow
+
+1. **Contact Admin**: Business contacts administrator for registration code
+2. **Receive Code**: Admin generates and provides unique code
+3. **Enter Code**: Business enters code in bot registration
+4. **Complete Profile**: Business provides name, address, and phone
+5. **Setup Pricing**: Set prices for different box sizes
+6. **Set Availability**: Configure sales time and active status
+
+## Deployment
+
+### Render Deployment
+The application is configured for deployment on Render with automatic webhook setup.
+
+1. **Push to GitHub**: Ensure your code is in a GitHub repository
+2. **Deploy on Render**: Use the provided `render.yaml` for blueprint deployment
+3. **Set Environment Variables**: Configure all required environment variables
+4. **Set Webhook**: The deployment script automatically sets the webhook URL
+
+See `RENDER_DEPLOYMENT.md` for detailed deployment instructions.
+
+## City Management
+
+### Current Cities
+- **Almaty** (Алматы / Алматы)
+- **Astana** (Астана / Астана)
+
+### Adding New Cities
+Use the provided script to add new cities:
 ```bash
-npm run admin
+npm run add-city
 ```
 
-## Scripts
+## Language Support
 
-- `npm start` - Start the bot
-- `npm run dev` - Start in development mode with nodemon
-- `npm run setup` - Initialize database and create admin user
-- `npm run admin` - Access admin panel
-- `npm run render-setup` - Setup for Render deployment
+The bot supports three languages:
+- **English** (en)
+- **Russian** (ru) 
+- **Kazakh** (kk)
+
+Users can select their preferred language during initial setup.
+
+## Security Features
+
+- **Code-based Registration**: Businesses require admin-provided codes
+- **Code Expiration**: All codes expire after 1 year
+- **Unique Code Generation**: Prevents code conflicts
+- **Admin-only Access**: Restricted admin functions
+- **Session Management**: Secure user session handling
 
 ## Contributing
 
@@ -202,4 +178,11 @@ npm run admin
 
 ## License
 
-MIT License - see LICENSE file for details. 
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions:
+- Check the documentation
+- Review the deployment guide
+- Contact the development team 

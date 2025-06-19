@@ -10,7 +10,7 @@ services:
         value: production
       - key: BOT_TOKEN
         sync: false
-      - key: ADMIN_PHONE
+      - key: ADMIN_IDS
         sync: false
       - key: DATABASE_URL
         fromDatabase:

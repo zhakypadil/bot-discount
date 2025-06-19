@@ -8,7 +8,9 @@
     "dev": "nodemon src/index.js",
     "setup": "node scripts/setup.js",
     "admin": "node scripts/admin.js",
-    "render-setup": "node scripts/render-setup.js"
+    "render-setup": "node scripts/render-setup.js",
+    "generate-codes": "node scripts/generate-initial-codes.js",
+    "check-deployment": "node scripts/deployment-checklist.js"
   },
   "keywords": [
     "telegram",

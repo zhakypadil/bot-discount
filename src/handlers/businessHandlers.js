@@ -19,37 +19,48 @@ async function handleBusinessRegistration(ctx) {
     
     switch (step) {
         case 'code':
-            // Automatically generate a business code
-            try {
-                const businessCode = await BusinessCode.createCode();
-                
-                // Store the generated code in session
-                ctx.session.businessCode = businessCode.code;
-                ctx.session.registrationStep = 'name';
-                
-                await ctx.reply(getText(lang, 'codeGenerated', { code: businessCode.code }));
-                await ctx.reply(getText(lang, 'codeValid'));
-                
-            } catch (error) {
-                console.error('Code generation error:', error);
-                await ctx.reply(getText(lang, 'codeGenerationFailed'));
-            }
+            await ctx.reply(getText(lang, 'enterBusinessCode'));
             break;
             
         case 'name':
-            const name = ctx.message.text;
-            ctx.session.businessName = name;
+            const code = ctx.message.text;
+            const businessCode = await BusinessCode.findOne({ 
+                where: { 
+                    code: code,
+                    isUsed: false,
+                    expiresAt: { [require('sequelize').Op.gt]: new Date() }
+                }
+            });
+            
+            if (!businessCode) {
+                await ctx.reply(getText(lang, 'invalidCode'));
+                return;
+            }
+            
+            // Mark code as used
+            await businessCode.update({ 
+                isUsed: true,
+                usedBy: null // Will be set when business is created
+            });
+            
+            ctx.session.businessCode = code;
+            ctx.session.registrationStep = 'name';
+            await ctx.reply(getText(lang, 'codeValid'));
+            break;
+            
+        case 'address':
+            ctx.session.businessName = ctx.message.text;
             ctx.session.registrationStep = 'address';
             await ctx.reply(getText(lang, 'businessAddress'));
             break;
             
-        case 'address':
+        case 'phone':
             ctx.session.businessAddress = ctx.message.text;
             ctx.session.registrationStep = 'phone';
             await ctx.reply(getText(lang, 'contactPhone'));
             break;
             
-        case 'phone':
+        case 'complete':
             const phone = ctx.message.text;
             
             try {
@@ -63,12 +74,9 @@ async function handleBusinessRegistration(ctx) {
                     city: city
                 });
                 
-                // Mark the generated code as used
+                // Update business code with business ID
                 await BusinessCode.update(
-                    { 
-                        isUsed: true,
-                        usedBy: business.id 
-                    },
+                    { usedBy: business.id },
                     { where: { code: ctx.session.businessCode } }
                 );
                 

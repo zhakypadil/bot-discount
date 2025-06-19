@@ -64,7 +64,7 @@ BusinessCode.generateCode = async function() {
     return code;
 };
 
-// Static method to create a new business code
+// Static method to create a new business code (for admin use)
 BusinessCode.createCode = async function() {
     const code = await this.generateCode();
     const expiresAt = new Date();
@@ -74,6 +74,50 @@ BusinessCode.createCode = async function() {
         code: code,
         expiresAt: expiresAt
     });
+};
+
+// Static method to generate multiple codes at once
+BusinessCode.generateMultipleCodes = async function(count = 10) {
+    const codes = [];
+    for (let i = 0; i < count; i++) {
+        try {
+            const code = await this.createCode();
+            codes.push(code);
+        } catch (error) {
+            console.error(`Failed to generate code ${i + 1}:`, error.message);
+        }
+    }
+    return codes;
+};
+
+// Static method to get available unused codes
+BusinessCode.getAvailableCodes = async function() {
+    return await this.findAll({
+        where: {
+            isUsed: false,
+            expiresAt: { [require('sequelize').Op.gt]: new Date() }
+        },
+        order: [['createdAt', 'ASC']]
+    });
+};
+
+// Static method to get code count statistics
+BusinessCode.getCodeStats = async function() {
+    const total = await this.count();
+    const used = await this.count({ where: { isUsed: true } });
+    const available = await this.count({ 
+        where: { 
+            isUsed: false,
+            expiresAt: { [require('sequelize').Op.gt]: new Date() }
+        }
+    });
+    const expired = await this.count({ 
+        where: { 
+            expiresAt: { [require('sequelize').Op.lte]: new Date() }
+        }
+    });
+
+    return { total, used, available, expired };
 };
 
 module.exports = BusinessCode; 
