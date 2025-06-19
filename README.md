@@ -17,7 +17,7 @@ A Telegram bot-based SaaS app for food businesses to sell unsold end-of-day prod
 - Easy to add more cities
 
 ### For Businesses
-- Register with business codes
+- **Automatic registration** with auto-generated business codes
 - Set prices for small/medium/large mystery boxes
 - Set sales start time
 - Mark active/inactive status
@@ -144,10 +144,19 @@ To add a new language:
 
 ### Business Codes
 - `id` - Primary key
-- `code` - Business registration code
+- `code` - Auto-generated business registration code
 - `is_used` - Whether code has been used
 - `used_by` - Business ID that used the code
-- `expires_at` - Code expiration date
+- `expires_at` - Code expiration date (1 year from creation)
+
+## Business Code System
+
+The bot automatically generates unique business codes when users register as businesses:
+
+- **Format**: `BUS` + timestamp + random string (e.g., `BUS123456ABC`)
+- **Validity**: 1 year from generation
+- **Uniqueness**: Each code is guaranteed to be unique
+- **Automatic Assignment**: Codes are automatically assigned to the registering business
 
 ## Deployment
 
@@ -169,7 +178,7 @@ ADMIN_PHONE=+1234567890
 
 ## Admin Panel
 
-Access the admin panel to manage business codes:
+Access the admin panel to manage the system:
 
 ```bash
 npm run admin
