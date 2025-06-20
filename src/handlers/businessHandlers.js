@@ -142,9 +142,17 @@ async function handleSetPricesCallback(ctx) {
 
 // Set individual box price callbacks
 async function handleSetPriceSmallCallback(ctx) {
+    console.log('handleSetPriceSmallCallback called');
+    console.log('ctx.session before:', ctx.session);
+    
     const lang = ctx.session?.language || 'en';
     
+    // Set session state for price input
+    ctx.session = ctx.session || {};
+    console.log('ctx.session after initialization:', ctx.session);
+    
     ctx.session.priceInputStep = 'small';
+    console.log('priceInputStep set to:', ctx.session.priceInputStep);
     
     const keyboard = Markup.inlineKeyboard([
         [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
@@ -157,6 +165,8 @@ async function handleSetPriceSmallCallback(ctx) {
 async function handleSetPriceMediumCallback(ctx) {
     const lang = ctx.session?.language || 'en';
     
+    // Set session state for price input
+    ctx.session = ctx.session || {};
     ctx.session.priceInputStep = 'medium';
     
     const keyboard = Markup.inlineKeyboard([
@@ -170,6 +180,8 @@ async function handleSetPriceMediumCallback(ctx) {
 async function handleSetPriceLargeCallback(ctx) {
     const lang = ctx.session?.language || 'en';
     
+    // Set session state for price input
+    ctx.session = ctx.session || {};
     ctx.session.priceInputStep = 'large';
     
     const keyboard = Markup.inlineKeyboard([
@@ -185,6 +197,11 @@ async function handlePriceInput(ctx) {
     const telegramId = ctx.from.id.toString();
     const lang = ctx.session?.language || 'en';
     const input = ctx.message.text;
+    
+    // Initialize session if it doesn't exist
+    if (!ctx.session) {
+        ctx.session = {};
+    }
     const step = ctx.session.priceInputStep;
     
     // Check if input is a valid price format (number)
