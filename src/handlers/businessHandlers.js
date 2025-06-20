@@ -11,7 +11,7 @@ async function handleBusinessRegistration(ctx) {
     const city = ctx.session?.city;
     
     if (!lang || !city) {
-        await ctx.reply('Please complete language and city selection first');
+        await ctx.reply(getText(lang, 'notRegistered'));
         return;
     }
     

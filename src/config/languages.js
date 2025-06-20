@@ -5,6 +5,10 @@ const languages = {
         selectCity: "Please select your city:",
         citySelected: "City selected: {city}",
         mainMenu: "Main Menu",
+        business: "Business",
+        customer: "Customer",
+        help: "Help",
+        welcomeCustomer: "Welcome! You can now browse available mystery boxes in your city.",
         registerAsBusiness: "Register as Business",
         registerAsCustomer: "Register as Customer",
         backToMain: "Back to Main Menu",
@@ -59,16 +63,22 @@ const languages = {
         customerRegistrationSuccess: "✅ Registration successful!\n\nWelcome, {name}! You can now browse available mystery boxes in your city.",
         
         // Customer browsing
+        viewBusinesses: "View Businesses",
         availableBusinesses: "Available businesses in {city}:",
         noBusinessesAvailable: "No businesses are currently active in {city}.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Sales Time: {time}\n\nSmall Box: {smallPrice} ₸\nMedium Box: {mediumPrice} ₸\nLarge Box: {largePrice} ₸",
+        businessNotAvailable: "This business is not available.",
+        businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Sales Time: {time}\n\nSmall Box: {smallPrice} ₸\nMedium Box: {mediumPrice} ₸\nLarge Box: {largePrice} ₸",
         selectBoxSize: "Select box size:",
-        interestRecorded: "✅ Your interest has been recorded! The business will contact you.",
+        interestRecorded: "✅ Your interest has been recorded!\n\nBox: {size}\nBusiness: {business}\nPrice: {price} ₸\nTime: {time}\n\nThe business will contact you.",
         alreadyInterested: "You have already expressed interest in this business.",
+        leaveFeedback: "Leave Feedback",
         
         // Feedback
         feedbackPrompt: "How was your mystery box experience?",
         feedbackSubmitted: "✅ Thank you for your feedback!",
+        feedbackForBusiness: "Feedback for {business}:",
+        submitYourFeedback: "Please submit your feedback:",
+        unableToSubmit: "Unable to submit feedback. Please try again.",
         
         // Errors
         businessNotFound: "Business not found.",
@@ -87,6 +97,10 @@ const languages = {
         selectCity: "Пожалуйста, выберите ваш город:",
         citySelected: "Город выбран: {city}",
         mainMenu: "Главное меню",
+        business: "Бизнес",
+        customer: "Клиент",
+        help: "Помощь",
+        welcomeCustomer: "Добро пожаловать! Теперь вы можете просматривать доступные таинственные коробки в вашем городе.",
         registerAsBusiness: "Зарегистрироваться как бизнес",
         registerAsCustomer: "Зарегистрироваться как клиент",
         backToMain: "Вернуться в главное меню",
@@ -141,16 +155,22 @@ const languages = {
         customerRegistrationSuccess: "✅ Регистрация прошла успешно!\n\nДобро пожаловать, {name}! Теперь вы можете просматривать доступные таинственные коробки в вашем городе.",
         
         // Customer browsing
+        viewBusinesses: "Просмотр предприятий",
         availableBusinesses: "Доступные предприятия в {city}:",
         noBusinessesAvailable: "В {city} в настоящее время нет активных предприятий.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Время продаж: {time}\n\nМаленькая коробка: {smallPrice} ₸\nСредняя коробка: {mediumPrice} ₸\nБольшая коробка: {largePrice} ₸",
+        businessNotAvailable: "Это предприятие недоступно.",
+        businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Время продаж: {time}\n\nМаленькая коробка: {smallPrice} ₸\nСредняя коробка: {mediumPrice} ₸\nБольшая коробка: {largePrice} ₸",
         selectBoxSize: "Выберите размер коробки:",
-        interestRecorded: "✅ Ваш интерес зафиксирован! Предприятие свяжется с вами.",
+        interestRecorded: "✅ Ваш интерес зафиксирован!\n\nКоробка: {size}\nБизнес: {business}\nЦена: {price} ₸\nВремя: {time}\n\nПредприятие свяжется с вами.",
         alreadyInterested: "Вы уже выразили интерес к этому предприятию.",
+        leaveFeedback: "Оставить отзыв",
         
         // Feedback
         feedbackPrompt: "Как вам опыт с таинственной коробкой?",
         feedbackSubmitted: "✅ Спасибо за ваш отзыв!",
+        feedbackForBusiness: "{business} кәсіпорынына пікір:",
+        submitYourFeedback: "Өз пікіріңізді жіберіңіз:",
+        unableToSubmit: "Пікір жіберу мүмкін емес. Қайталап көріңіз.",
         
         // Errors
         businessNotFound: "Предприятие не найдено.",
@@ -169,6 +189,10 @@ const languages = {
         selectCity: "Өз қалаңызды таңдаңыз:",
         citySelected: "Қала таңдалды: {city}",
         mainMenu: "Басты меню",
+        business: "Кәсіпорын",
+        customer: "Тұтынушы",
+        help: "Көмек",
+        welcomeCustomer: "Қош келдіңіз! Енді сіз өз қалаңыздағы қолжетімді жұмбақ қораптарды шолуға болады.",
         registerAsBusiness: "Кәсіпорын ретінде тіркелу",
         registerAsCustomer: "Тұтынушы ретінде тіркелу",
         backToMain: "Басты менюге оралу",
@@ -223,16 +247,22 @@ const languages = {
         customerRegistrationSuccess: "✅ Тіркеу сәтті болды!\n\nҚош келдіңіз, {name}! Енді сіз өз қалаңыздағы қолжетімді жұмбақ қораптарды шолуға болады.",
         
         // Customer browsing
+        viewBusinesses: "Кәсіпорындарды көру",
         availableBusinesses: "{city} қаласындағы қолжетімді кәсіпорындар:",
         noBusinessesAvailable: "{city} қаласында әзірше белсенді кәсіпорындар жоқ.",
-        businessInfo: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Сату уақыты: {time}\n\nКіші қорап: {smallPrice} ₸\nОрта қорап: {mediumPrice} ₸\nҮлкен қорап: {largePrice} ₸",
+        businessNotAvailable: "Бұл кәсіпорын қолжетімді емес.",
+        businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Сату уақыты: {time}\n\nКіші қорап: {smallPrice} ₸\nОрта қорап: {mediumPrice} ₸\nҮлкен қорап: {largePrice} ₸",
         selectBoxSize: "Қорап өлшемін таңдаңыз:",
-        interestRecorded: "✅ Сіздің қызығушылығыңыз тіркелді! Кәсіпорын сізбен байланысады.",
+        interestRecorded: "✅ Сіздің қызығушылығыңыз тіркелді!\n\nКоробка: {size}\nБизнес: {business}\nБаға: {price} ₸\nУақыт: {time}\n\nКәсіпорын сізбен байланысады.",
         alreadyInterested: "Сіз бұл кәсіпорынға қызығушылық білдіргенсіз.",
+        leaveFeedback: "Пікір қалдыру",
         
         // Feedback
         feedbackPrompt: "Жұмбақ қорап тәжірибесі қалай болды?",
         feedbackSubmitted: "✅ Пікіріңіз үшін рахмет!",
+        feedbackForBusiness: "{business} кәсіпорынына пікір:",
+        submitYourFeedback: "Өз пікіріңізді жіберіңіз:",
+        unableToSubmit: "Пікір жіберу мүмкін емес. Қайталап көріңіз.",
         
         // Errors
         businessNotFound: "Кәсіпорын табылмады.",
@@ -242,10 +272,7 @@ const languages = {
         notCustomer: "Бұл функция тек тұтынушылар үшін қолжетімді.",
         
         // Help
-        helpInfo: "🤖 Mystery Box боты туралы ақпарат\n\nБұл бот тамақ кәсіпорындарына күндің соңында сатылмаған өнімдерді тұтынушыларға жұмбақ қораптарда сатуға көмектеседі.\n\n📱 Кәсіпорындар үшін:\n• Администратордан кодпен тіркеліңіз\n• Бағалар мен қолжетімділікті орнатыңыз\n• Тұтынушы қызығушылығын көріңіз\n\n👥 Тұтынушылар үшін:\n• Қолжетімді кәсіпорындарды шолыңыз\n• Жұмбақ қораптарға қызығушылық білдіріңіз\n• Пікір қалдырыңыз\n\n📞 Көмек керек пе? Администраторға хабарласыңыз.",
-        
-        // Registration success
-        customerRegistrationSuccess: "✅ Тіркеу сәтті болды!\n\nҚош келдіңіз, {name}! Енді сіз өз қалаңыздағы қолжетімді жұмбақ қораптарды шолуға болады."
+        helpInfo: "🤖 Mystery Box боты туралы ақпарат\n\nБұл бот тамақ кәсіпорындарына күндің соңында сатылмаған өнімдерді тұтынушыларға жұмбақ қораптарда сатуға көмектеседі.\n\n📱 Кәсіпорындар үшін:\n• Администратордан кодпен тіркеліңіз\n• Бағалар мен қолжетімділікті орнатыңыз\n• Тұтынушы қызығушылығын көріңіз\n\n👥 Тұтынушылар үшін:\n• Қолжетімді кәсіпорындарды шолыңыз\n• Жұмбақ қораптарға қызығушылық білдіріңіз\n• Пікір қалдырыңыз\n\n📞 Көмек керек пе? Администраторға хабарласыңыз."
     }
 };
 

@@ -36,7 +36,7 @@ async function handleLanguageSelection(ctx) {
         ]
     ]);
 
-    await ctx.reply(getText('en', 'selectLanguage'), keyboard);
+    await ctx.reply(getText('en', 'welcome'), keyboard);
 }
 
 // City selection handler
@@ -61,7 +61,7 @@ async function handleMainMenu(ctx, lang = 'en') {
         ]
     ]);
 
-    await ctx.reply(getText(lang, 'welcome'), keyboard);
+    await ctx.reply(getText(lang, 'mainMenu'), keyboard);
 }
 
 // Start command handler
@@ -131,7 +131,7 @@ async function handleBusinessCallback(ctx) {
     const city = ctx.session?.city;
     
     if (!lang || !city) {
-        await ctx.answerCbQuery('Please complete registration first');
+        await ctx.answerCbQuery(getText(lang, 'notRegistered'));
         return;
     }
     
@@ -171,7 +171,7 @@ async function handleCustomerCallback(ctx) {
     const city = ctx.session?.city;
     
     if (!lang || !city) {
-        await ctx.answerCbQuery('Please complete registration first');
+        await ctx.answerCbQuery(getText(lang, 'notRegistered'));
         return;
     }
     
@@ -188,7 +188,7 @@ async function handleCustomerCallback(ctx) {
     
     // Create customer automatically using Telegram data
     try {
-        const customerName = ctx.from.first_name || ctx.from.username || 'Customer';
+        const customerName = ctx.from.first_name || ctx.from.username || getText(lang, 'customer');
         
         const customer = await Customer.create({
             telegramId: telegramId,
@@ -260,7 +260,7 @@ async function handleRefreshCallback(ctx) {
     const city = ctx.session?.city;
     
     if (!city) {
-        await ctx.answerCbQuery('Please complete registration first');
+        await ctx.answerCbQuery(getText(lang, 'notRegistered'));
         return;
     }
     
@@ -274,7 +274,7 @@ async function handleViewBusinessesCallback(ctx) {
     const city = ctx.session?.city;
     
     if (!city) {
-        await ctx.answerCbQuery('Please complete registration first');
+        await ctx.answerCbQuery(getText(lang, 'notRegistered'));
         return;
     }
     

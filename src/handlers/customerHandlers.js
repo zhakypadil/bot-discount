@@ -3,7 +3,7 @@ const Customer = require('../models/Customer');
 const Business = require('../models/Business');
 const Interest = require('../models/Interest');
 const Feedback = require('../models/Feedback');
-const { getText } = require('./mainHandlers');
+const { getText, getCityName } = require('./mainHandlers');
 
 // Show customer menu
 async function showCustomerMenu(ctx, lang) {
@@ -22,7 +22,7 @@ async function handleViewBusinessesCallback(ctx) {
     const city = ctx.session?.city;
     
     if (!city) {
-        await ctx.answerCbQuery('Please complete registration first');
+        await ctx.answerCbQuery(getText(lang, 'notRegistered'));
         return;
     }
     
@@ -36,7 +36,7 @@ async function handleViewBusinessesCallback(ctx) {
     
     if (businesses.length === 0) {
         await ctx.answerCbQuery();
-        await ctx.editMessageText(getText(lang, 'noBusinessesAvailable'));
+        await ctx.editMessageText(getText(lang, 'noBusinessesAvailable', { city: getCityName(city, lang) }));
         return;
     }
     
@@ -121,7 +121,7 @@ async function handleInterestCallback(ctx) {
         });
         
         if (existingInterest) {
-            await ctx.answerCbQuery('You have already expressed interest in this box size');
+            await ctx.answerCbQuery(getText(lang, 'alreadyInterested'));
             return;
         }
         
