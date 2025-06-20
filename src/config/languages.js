@@ -70,7 +70,7 @@ const languages = {
         businessNotAvailable: "This business is not available.",
         businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Sales Time: {time}\n\nSmall Box: {smallPrice} ₸\nMedium Box: {mediumPrice} ₸\nLarge Box: {largePrice} ₸\n\n💡 Box selection notifies the restaurant of your interest. First come, first serve basis.",
         selectBoxSize: "Select box size:",
-        interestRecorded: "✅ Your interest has been recorded!\n\nBox: {size}\nBusiness: {business}\nPrice: {price} ₸\nTime: {time}\n\nThe business will contact you.",
+        interestRecorded: "✅ Your interest has been recorded!\n\nBox: {size}\nBusiness: {business}\nPrice: {price} ₸\nTime: {time}\n",
         alreadyInterested: "You have already expressed interest in this business.",
         leaveFeedback: "Leave Feedback",
         
@@ -163,7 +163,7 @@ const languages = {
         businessNotAvailable: "Это предприятие недоступно.",
         businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Время продаж: {time}\n\nМаленькая коробка: {smallPrice} ₸\nСредняя коробка: {mediumPrice} ₸\nБольшая коробка: {largePrice} ₸\n\n💡 Выбор коробки уведомляет ресторан о вашем интересе. Первым пришел - первым обслужили.",
         selectBoxSize: "Выберите размер коробки:",
-        interestRecorded: "✅ Ваш интерес зафиксирован!\n\nКоробка: {size}\nБизнес: {business}\nЦена: {price} ₸\nВремя: {time}\n\nПредприятие свяжется с вами.",
+        interestRecorded: "✅ Ваш интерес зафиксирован!\n\nКоробка: {size}\nБизнес: {business}\nЦена: {price} ₸\nВремя: {time}\n",
         alreadyInterested: "Вы уже выразили интерес к этому предприятию.",
         leaveFeedback: "Оставить отзыв",
         
@@ -256,7 +256,7 @@ const languages = {
         businessNotAvailable: "Бұл кәсіпорын қолжетімді емес.",
         businessDetails: "🏪 {name}\n📍 {address}\n📞 {phone}\n⏰ Сату уақыты: {time}\n\nКіші қорап: {smallPrice} ₸\nОрта қорап: {mediumPrice} ₸\nҮлкен қорап: {largePrice} ₸\n\n💡 Қорап таңдау ресторанға қызығушылығыңыз туралы хабарлайды. Алғашқы келген алғашқы қызмет көрсетіледі.",
         selectBoxSize: "Қорап өлшемін таңдаңыз:",
-        interestRecorded: "✅ Сіздің қызығушылығыңыз тіркелді!\n\nКоробка: {size}\nБизнес: {business}\nБаға: {price} ₸\nУақыт: {time}\n\nКәсіпорын сізбен байланысады.",
+        interestRecorded: "✅ Сіздің қызығушылығыңыз тіркелді!\n\nКоробка: {size}\nБизнес: {business}\nБаға: {price} ₸\nУақыт: {time}\n",
         alreadyInterested: "Сіз бұл кәсіпорынға қызығушылық білдіргенсіз.",
         leaveFeedback: "Пікір қалдыру",
         
