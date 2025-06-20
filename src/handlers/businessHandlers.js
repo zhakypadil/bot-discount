@@ -129,17 +129,55 @@ async function showBusinessDashboard(ctx, business, lang) {
 async function handleSetPricesCallback(ctx) {
     const lang = ctx.session?.language || 'en';
     
-    // Set session to expect price input for small box
+    const keyboard = Markup.inlineKeyboard([
+        [Markup.button.callback(getText(lang, 'smallBox'), 'set_price_small')],
+        [Markup.button.callback(getText(lang, 'mediumBox'), 'set_price_medium')],
+        [Markup.button.callback(getText(lang, 'largeBox'), 'set_price_large')],
+        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
+    ]);
+    
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'selectBoxToSetPrice'), keyboard);
+}
+
+// Set individual box price callbacks
+async function handleSetPriceSmallCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    
     ctx.session.priceInputStep = 'small';
     
     const keyboard = Markup.inlineKeyboard([
-        [
-            Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
-        ]
+        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
     ]);
     
     await ctx.answerCbQuery();
     await ctx.editMessageText(getText(lang, 'enterSmallBoxPrice'), keyboard);
+}
+
+async function handleSetPriceMediumCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    
+    ctx.session.priceInputStep = 'medium';
+    
+    const keyboard = Markup.inlineKeyboard([
+        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
+    ]);
+    
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'enterMediumBoxPrice'), keyboard);
+}
+
+async function handleSetPriceLargeCallback(ctx) {
+    const lang = ctx.session?.language || 'en';
+    
+    ctx.session.priceInputStep = 'large';
+    
+    const keyboard = Markup.inlineKeyboard([
+        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
+    ]);
+    
+    await ctx.answerCbQuery();
+    await ctx.editMessageText(getText(lang, 'enterLargeBoxPrice'), keyboard);
 }
 
 // Handle manual price input
@@ -173,53 +211,20 @@ async function handlePriceInput(ctx) {
             return;
         }
         
-        switch (step) {
-            case 'small':
-                // Store small price and ask for medium
-                ctx.session.smallPrice = price;
-                ctx.session.priceInputStep = 'medium';
-                const mediumKeyboard = Markup.inlineKeyboard([
-                    [
-                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
-                    ]
-                ]);
-                await ctx.reply(getText(lang, 'enterMediumBoxPrice'), mediumKeyboard);
-                break;
-                
-            case 'medium':
-                // Store medium price and ask for large
-                ctx.session.mediumPrice = price;
-                ctx.session.priceInputStep = 'large';
-                const largeKeyboard = Markup.inlineKeyboard([
-                    [
-                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
-                    ]
-                ]);
-                await ctx.reply(getText(lang, 'enterLargeBoxPrice'), largeKeyboard);
-                break;
-                
-            case 'large':
-                // Store large price and update all prices
-                ctx.session.largePrice = price;
-                
-                await business.update({
-                    smallPrice: ctx.session.smallPrice,
-                    mediumPrice: ctx.session.mediumPrice,
-                    largePrice: price
-                });
-                
-                // Clear session
-                delete ctx.session.priceInputStep;
-                delete ctx.session.smallPrice;
-                delete ctx.session.mediumPrice;
-                delete ctx.session.largePrice;
-                
-                await ctx.reply(getText(lang, 'pricesUpdated'));
-                
-                // Show updated dashboard
-                await showBusinessDashboard(ctx, business, lang);
-                break;
-        }
+        // Update the specific box price
+        const updateData = {};
+        updateData[`${step}Price`] = price;
+        
+        await business.update(updateData);
+        
+        // Clear session
+        delete ctx.session.priceInputStep;
+        
+        const boxText = getText(lang, `${step}Box`);
+        await ctx.reply(getText(lang, 'priceUpdated', { box: boxText, price: price }));
+        
+        // Show updated dashboard
+        await showBusinessDashboard(ctx, business, lang);
         
     } catch (error) {
         console.error('Price update error:', error);
@@ -391,6 +396,9 @@ module.exports = {
     handleBusinessRegistration,
     showBusinessDashboard,
     handleSetPricesCallback,
+    handleSetPriceSmallCallback,
+    handleSetPriceMediumCallback,
+    handleSetPriceLargeCallback,
     handlePriceInput,
     handleSetTimeCallback,
     handleTimeCallback,
