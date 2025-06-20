@@ -137,8 +137,14 @@ async function handleSetPricesCallback(ctx) {
     // Set session to expect price input for small box
     ctx.session.priceInputStep = 'small';
     
+    const keyboard = Markup.inlineKeyboard([
+        [
+            Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+        ]
+    ]);
+    
     await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'enterSmallBoxPrice'));
+    await ctx.editMessageText(getText(lang, 'enterSmallBoxPrice'), keyboard);
 }
 
 // Handle manual price input
@@ -151,14 +157,24 @@ async function handlePriceInput(ctx) {
     // Check if input is a valid price format (number)
     const price = parseFloat(input);
     if (isNaN(price) || price < 0) {
-        await ctx.reply(getText(lang, 'invalidPrice'));
+        const errorKeyboard = Markup.inlineKeyboard([
+            [
+                Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+            ]
+        ]);
+        await ctx.reply(getText(lang, 'invalidPrice'), errorKeyboard);
         return;
     }
     
     try {
         const business = await Business.findOne({ where: { telegramId } });
         if (!business) {
-            await ctx.reply(getText(lang, 'businessNotFound'));
+            const errorKeyboard = Markup.inlineKeyboard([
+                [
+                    Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+                ]
+            ]);
+            await ctx.reply(getText(lang, 'businessNotFound'), errorKeyboard);
             return;
         }
         
@@ -167,14 +183,24 @@ async function handlePriceInput(ctx) {
                 // Store small price and ask for medium
                 ctx.session.smallPrice = price;
                 ctx.session.priceInputStep = 'medium';
-                await ctx.reply(getText(lang, 'enterMediumBoxPrice'));
+                const mediumKeyboard = Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+                    ]
+                ]);
+                await ctx.reply(getText(lang, 'enterMediumBoxPrice'), mediumKeyboard);
                 break;
                 
             case 'medium':
                 // Store medium price and ask for large
                 ctx.session.mediumPrice = price;
                 ctx.session.priceInputStep = 'large';
-                await ctx.reply(getText(lang, 'enterLargeBoxPrice'));
+                const largeKeyboard = Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+                    ]
+                ]);
+                await ctx.reply(getText(lang, 'enterLargeBoxPrice'), largeKeyboard);
                 break;
                 
             case 'large':
@@ -202,7 +228,12 @@ async function handlePriceInput(ctx) {
         
     } catch (error) {
         console.error('Price update error:', error);
-        await ctx.reply(getText(lang, 'error'));
+        const errorKeyboard = Markup.inlineKeyboard([
+            [
+                Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+            ]
+        ]);
+        await ctx.reply(getText(lang, 'error'), errorKeyboard);
     }
 }
 
@@ -316,8 +347,15 @@ async function handleViewInterestsCallback(ctx) {
             });
         }
         
+        // Add back to dashboard button
+        const keyboard = Markup.inlineKeyboard([
+            [
+                Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+            ]
+        ]);
+        
         await ctx.answerCbQuery();
-        await ctx.editMessageText(message);
+        await ctx.editMessageText(message, keyboard);
         
     } catch (error) {
         console.error('View interests error:', error);
@@ -335,6 +373,14 @@ async function handleBusinessDashboardCallback(ctx) {
         if (!business) {
             await ctx.answerCbQuery(getText(lang, 'businessNotFound'));
             return;
+        }
+        
+        // Clear any active price input session
+        if (ctx.session.priceInputStep) {
+            delete ctx.session.priceInputStep;
+            delete ctx.session.smallPrice;
+            delete ctx.session.mediumPrice;
+            delete ctx.session.largePrice;
         }
         
         await ctx.answerCbQuery();
