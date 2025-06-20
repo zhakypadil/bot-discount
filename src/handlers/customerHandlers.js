@@ -166,8 +166,7 @@ async function handleFeedbackCallback(ctx) {
         ctx.session.feedbackStep = 'message';
         
         await ctx.answerCbQuery();
-        await ctx.editMessageText(getText(lang, 'feedbackForBusiness', { business: business.name }));
-        await ctx.reply(getText(lang, 'submitYourFeedback'));
+        await ctx.editMessageText(getText(lang, 'feedbackForBusiness', { business: business.name }) + '\n\n' + getText(lang, 'submitYourFeedback'));
         
     } catch (error) {
         console.error('Feedback error:', error);
