@@ -103,6 +103,10 @@ async function handleBusinessRegistration(ctx) {
 
 // Show business dashboard
 async function showBusinessDashboard(ctx, business, lang) {
+    // Ensure session is maintained with business language
+    ctx.session = ctx.session || {};
+    ctx.session.language = lang;
+    
     const keyboard = Markup.inlineKeyboard([
         [Markup.button.callback(getText(lang, 'setPrices'), 'set_prices')],
         [Markup.button.callback(getText(lang, 'setTime'), 'set_time')],
@@ -129,67 +133,21 @@ async function showBusinessDashboard(ctx, business, lang) {
 async function handleSetPricesCallback(ctx) {
     const lang = ctx.session?.language || 'en';
     
-    const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback(getText(lang, 'smallBox'), 'set_price_small')],
-        [Markup.button.callback(getText(lang, 'mediumBox'), 'set_price_medium')],
-        [Markup.button.callback(getText(lang, 'largeBox'), 'set_price_large')],
-        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
-    ]);
-    
-    await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'selectBoxToSetPrice'), keyboard);
-}
-
-// Set individual box price callbacks
-async function handleSetPriceSmallCallback(ctx) {
-    console.log('handleSetPriceSmallCallback called');
-    console.log('ctx.session before:', ctx.session);
-    
-    const lang = ctx.session?.language || 'en';
-    
-    // Set session state for price input
+    // Ensure session is maintained
     ctx.session = ctx.session || {};
-    console.log('ctx.session after initialization:', ctx.session);
+    ctx.session.language = lang;
     
+    // Set session to expect price input for small box
     ctx.session.priceInputStep = 'small';
-    console.log('priceInputStep set to:', ctx.session.priceInputStep);
     
     const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
+        [
+            Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+        ]
     ]);
     
     await ctx.answerCbQuery();
     await ctx.editMessageText(getText(lang, 'enterSmallBoxPrice'), keyboard);
-}
-
-async function handleSetPriceMediumCallback(ctx) {
-    const lang = ctx.session?.language || 'en';
-    
-    // Set session state for price input
-    ctx.session = ctx.session || {};
-    ctx.session.priceInputStep = 'medium';
-    
-    const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
-    ]);
-    
-    await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'enterMediumBoxPrice'), keyboard);
-}
-
-async function handleSetPriceLargeCallback(ctx) {
-    const lang = ctx.session?.language || 'en';
-    
-    // Set session state for price input
-    ctx.session = ctx.session || {};
-    ctx.session.priceInputStep = 'large';
-    
-    const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')]
-    ]);
-    
-    await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'enterLargeBoxPrice'), keyboard);
 }
 
 // Handle manual price input
@@ -228,20 +186,53 @@ async function handlePriceInput(ctx) {
             return;
         }
         
-        // Update the specific box price
-        const updateData = {};
-        updateData[`${step}Price`] = price;
-        
-        await business.update(updateData);
-        
-        // Clear session
-        delete ctx.session.priceInputStep;
-        
-        const boxText = getText(lang, `${step}Box`);
-        await ctx.reply(getText(lang, 'priceUpdated', { box: boxText, price: price }));
-        
-        // Show updated dashboard
-        await showBusinessDashboard(ctx, business, lang);
+        switch (step) {
+            case 'small':
+                // Store small price and ask for medium
+                ctx.session.smallPrice = price;
+                ctx.session.priceInputStep = 'medium';
+                const mediumKeyboard = Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+                    ]
+                ]);
+                await ctx.reply(getText(lang, 'enterMediumBoxPrice'), mediumKeyboard);
+                break;
+                
+            case 'medium':
+                // Store medium price and ask for large
+                ctx.session.mediumPrice = price;
+                ctx.session.priceInputStep = 'large';
+                const largeKeyboard = Markup.inlineKeyboard([
+                    [
+                        Markup.button.callback(getText(lang, 'backToMenu'), 'business_dashboard')
+                    ]
+                ]);
+                await ctx.reply(getText(lang, 'enterLargeBoxPrice'), largeKeyboard);
+                break;
+                
+            case 'large':
+                // Store large price and update all prices
+                ctx.session.largePrice = price;
+                
+                await business.update({
+                    smallPrice: ctx.session.smallPrice,
+                    mediumPrice: ctx.session.mediumPrice,
+                    largePrice: price
+                });
+                
+                // Clear session
+                delete ctx.session.priceInputStep;
+                delete ctx.session.smallPrice;
+                delete ctx.session.mediumPrice;
+                delete ctx.session.largePrice;
+                
+                await ctx.reply(getText(lang, 'pricesUpdated'));
+                
+                // Show updated dashboard
+                await showBusinessDashboard(ctx, business, lang);
+                break;
+        }
         
     } catch (error) {
         console.error('Price update error:', error);
@@ -413,9 +404,6 @@ module.exports = {
     handleBusinessRegistration,
     showBusinessDashboard,
     handleSetPricesCallback,
-    handleSetPriceSmallCallback,
-    handleSetPriceMediumCallback,
-    handleSetPriceLargeCallback,
     handlePriceInput,
     handleSetTimeCallback,
     handleTimeCallback,

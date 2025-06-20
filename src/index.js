@@ -328,9 +328,6 @@ bot.action(/feedback_(.+)/, customerHandlers.handleFeedbackCallback);
 
 // Business flow callbacks
 bot.action('set_prices', businessHandlers.handleSetPricesCallback);
-bot.action('set_price_small', businessHandlers.handleSetPriceSmallCallback);
-bot.action('set_price_medium', businessHandlers.handleSetPriceMediumCallback);
-bot.action('set_price_large', businessHandlers.handleSetPriceLargeCallback);
 bot.action('set_time', businessHandlers.handleSetTimeCallback);
 bot.action(/time_(.+)/, businessHandlers.handleTimeCallback);
 bot.action(/mark_(.+)/, businessHandlers.handleStatusCallback);
