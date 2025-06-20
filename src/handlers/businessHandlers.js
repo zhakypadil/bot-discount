@@ -104,18 +104,13 @@ async function handleBusinessRegistration(ctx) {
 // Show business dashboard
 async function showBusinessDashboard(ctx, business, lang) {
     const keyboard = Markup.inlineKeyboard([
-        [
-            Markup.button.callback(getText(lang, 'setPrices'), 'set_prices'),
-            Markup.button.callback(getText(lang, 'setTime'), 'set_time')
+        [Markup.button.callback(getText(lang, 'setPrices'), 'set_prices')],
+        [Markup.button.callback(getText(lang, 'setTime'), 'set_time')],
+        [business.isActive 
+            ? Markup.button.callback(getText(lang, 'markInactive'), 'mark_inactive')
+            : Markup.button.callback(getText(lang, 'markActive'), 'mark_active')
         ],
-        [
-            business.isActive 
-                ? Markup.button.callback(getText(lang, 'markInactive'), 'mark_inactive')
-                : Markup.button.callback(getText(lang, 'markActive'), 'mark_active')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'viewInterests'), 'view_interests')
-        ]
+        [Markup.button.callback(getText(lang, 'viewInterests'), 'view_interests')]
     ]);
 
     await ctx.reply(getText(lang, 'businessDashboard', {

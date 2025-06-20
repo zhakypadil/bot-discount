@@ -52,13 +52,9 @@ async function handleCitySelection(ctx, lang) {
 // Main menu handler
 async function handleMainMenu(ctx, lang = 'en') {
     const keyboard = Markup.inlineKeyboard([
-        [
-            Markup.button.callback(getText(lang, 'business'), 'business'),
-            Markup.button.callback(getText(lang, 'customer'), 'customer')
-        ],
-        [
-            Markup.button.callback(getText(lang, 'help'), 'help')
-        ]
+        [Markup.button.callback(getText(lang, 'business'), 'business')],
+        [Markup.button.callback(getText(lang, 'customer'), 'customer')],
+        [Markup.button.callback(getText(lang, 'help'), 'help')]
     ]);
 
     await ctx.reply(getText(lang, 'mainMenu'), keyboard);

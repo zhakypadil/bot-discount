@@ -8,9 +8,7 @@ const { getText, getCityName } = require('./mainHandlers');
 // Show customer menu
 async function showCustomerMenu(ctx, lang) {
     const keyboard = Markup.inlineKeyboard([
-        [
-            Markup.button.callback(getText(lang, 'viewBusinesses'), 'view_businesses')
-        ]
+        [Markup.button.callback(getText(lang, 'viewBusinesses'), 'view_businesses')]
     ]);
 
     await ctx.reply(getText(lang, 'welcomeCustomer'), keyboard);
@@ -67,16 +65,12 @@ async function handleBusinessSelectionCallback(ctx) {
             return;
         }
         
-        // Show business details with box options
+        // Show business details with box options, each on its own row
         const keyboard = Markup.inlineKeyboard([
-            [
-                Markup.button.callback(getText(lang, 'smallBox'), `interest_${businessId}_small`),
-                Markup.button.callback(getText(lang, 'mediumBox'), `interest_${businessId}_medium`),
-                Markup.button.callback(getText(lang, 'largeBox'), `interest_${businessId}_large`)
-            ],
-            [
-                Markup.button.callback(getText(lang, 'leaveFeedback'), `feedback_${businessId}`)
-            ]
+            [Markup.button.callback(getText(lang, 'smallBox'), `interest_${businessId}_small`)],
+            [Markup.button.callback(getText(lang, 'mediumBox'), `interest_${businessId}_medium`)],
+            [Markup.button.callback(getText(lang, 'largeBox'), `interest_${businessId}_large`)],
+            [Markup.button.callback(getText(lang, 'leaveFeedback'), `feedback_${businessId}`)]
         ]);
         
         await ctx.answerCbQuery();
