@@ -5,10 +5,60 @@ const Customer = require('../models/Customer');
 
 // Helper function to get text in user's language
 function getText(lang, key, replacements = {}) {
-    const text = languages[lang]?.[key] || languages['en'][key] || key;
-    return Object.keys(replacements).reduce((result, key) => {
-        return result.replace(`{${key}}`, replacements[key]);
-    }, text);
+    const translations = require('./config/languages');
+    let text = translations[lang]?.[key] || translations['en'][key] || key;
+    
+    Object.keys(replacements).forEach(placeholder => {
+        text = text.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
+    });
+    
+    return text;
+}
+
+// Helper function to get plural form based on count and language
+function getPluralForm(lang, count, singularKey, pluralKey) {
+    if (count === 1) {
+        return getText(lang, singularKey);
+    }
+    
+    // For Russian: 2-4 use special plural form, 5+ use plural
+    if (lang === 'ru') {
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+            return getText(lang, pluralKey);
+        }
+        
+        if (lastDigit === 1) {
+            return getText(lang, singularKey);
+        } else if (lastDigit >= 2 && lastDigit <= 4) {
+            return getText(lang, 'customerPlural'); // We'll add this for Russian
+        } else {
+            return getText(lang, pluralKey);
+        }
+    }
+    
+    // For Kazakh: similar to Russian
+    if (lang === 'kk') {
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+            return getText(lang, pluralKey);
+        }
+        
+        if (lastDigit === 1) {
+            return getText(lang, singularKey);
+        } else if (lastDigit >= 2 && lastDigit <= 4) {
+            return getText(lang, 'customerPlural'); // We'll add this for Kazakh
+        } else {
+            return getText(lang, pluralKey);
+        }
+    }
+    
+    // For English: simple plural
+    return count === 1 ? getText(lang, singularKey) : getText(lang, pluralKey);
 }
 
 // Helper function to get city name in user's language
@@ -319,5 +369,6 @@ module.exports = {
     handleViewBusinessesCallback,
     handleCustomerMenu,
     getText,
+    getPluralForm,
     getCityName
 }; 

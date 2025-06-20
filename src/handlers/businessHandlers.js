@@ -2,7 +2,7 @@ const { Markup } = require('telegraf');
 const Business = require('../models/Business');
 const BusinessCode = require('../models/BusinessCode');
 const Interest = require('../models/Interest');
-const { getText } = require('./mainHandlers');
+const { getText, getPluralForm } = require('./mainHandlers');
 
 // Business registration flow
 async function handleBusinessRegistration(ctx) {
@@ -351,7 +351,8 @@ async function handleViewInterestsCallback(ctx) {
             
             Object.keys(summary).forEach(size => {
                 const sizeText = getText(lang, `${size}Box`);
-                message += `${sizeText}: ${summary[size]} customers\n`;
+                const customerText = getPluralForm(lang, summary[size], 'customer', 'customers');
+                message += `${sizeText}: ${summary[size]} ${customerText}\n`;
             });
         }
         
