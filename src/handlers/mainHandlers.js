@@ -5,8 +5,7 @@ const Customer = require('../models/Customer');
 
 // Helper function to get text in user's language
 function getText(lang, key, replacements = {}) {
-    const translations = require('./config/languages');
-    let text = translations[lang]?.[key] || translations['en'][key] || key;
+    let text = languages[lang]?.[key] || languages['en'][key] || key;
     
     Object.keys(replacements).forEach(placeholder => {
         text = text.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
