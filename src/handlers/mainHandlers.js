@@ -73,18 +73,10 @@ async function handleStart(ctx) {
     const existingCustomer = await Customer.findOne({ where: { telegramId } });
     
     if (existingBusiness) {
-        // User is a business, show business dashboard
+        // User is a business, show business dashboard with navigation buttons
         const lang = existingBusiness.language;
-        await ctx.reply(getText(lang, 'businessDashboard', {
-            name: existingBusiness.name,
-            address: existingBusiness.address,
-            phone: existingBusiness.phone,
-            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
-            smallPrice: existingBusiness.smallPrice,
-            mediumPrice: existingBusiness.mediumPrice,
-            largePrice: existingBusiness.largePrice,
-            time: existingBusiness.salesTime
-        }));
+        const { showBusinessDashboard } = require('./businessHandlers');
+        await showBusinessDashboard(ctx, existingBusiness, lang);
         return;
     }
     
@@ -148,18 +140,10 @@ async function handleBusinessCallback(ctx) {
     const existingBusiness = await Business.findOne({ where: { telegramId } });
     
     if (existingBusiness) {
-        // Show business dashboard
+        // Show business dashboard with navigation buttons
         await ctx.answerCbQuery();
-        await ctx.editMessageText(getText(lang, 'businessDashboard', {
-            name: existingBusiness.name,
-            address: existingBusiness.address,
-            phone: existingBusiness.phone,
-            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
-            smallPrice: existingBusiness.smallPrice,
-            mediumPrice: existingBusiness.mediumPrice,
-            largePrice: existingBusiness.largePrice,
-            time: existingBusiness.salesTime
-        }));
+        const { showBusinessDashboard } = require('./businessHandlers');
+        await showBusinessDashboard(ctx, existingBusiness, lang);
         return;
     }
     
@@ -258,17 +242,9 @@ async function handleBackToMainCallback(ctx) {
     const existingCustomer = await Customer.findOne({ where: { telegramId } });
     
     if (existingBusiness) {
-        // Show business dashboard
-        await ctx.editMessageText(getText(lang, 'businessDashboard', {
-            name: existingBusiness.name,
-            address: existingBusiness.address,
-            phone: existingBusiness.phone,
-            status: existingBusiness.isActive ? getText(lang, 'active') : getText(lang, 'inactive'),
-            smallPrice: existingBusiness.smallPrice,
-            mediumPrice: existingBusiness.mediumPrice,
-            largePrice: existingBusiness.largePrice,
-            time: existingBusiness.salesTime
-        }));
+        // Show business dashboard with navigation buttons
+        const { showBusinessDashboard } = require('./businessHandlers');
+        await showBusinessDashboard(ctx, existingBusiness, lang);
     } else if (existingCustomer) {
         // Show customer menu
         await handleCustomerMenu(ctx, lang);
