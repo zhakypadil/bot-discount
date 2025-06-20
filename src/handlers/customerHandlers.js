@@ -129,19 +129,20 @@ async function handleInterestCallback(ctx) {
         const sizeText = getText(lang, `${boxSize}Box`);
         const price = business[`${boxSize}Price`];
         
-        await ctx.answerCbQuery(getText(lang, 'interestRecorded', {
+        const confirmationMessage = getText(lang, 'interestRecorded', {
             size: sizeText,
             business: business.name,
             price: price,
             time: business.salesTime
-        }));
+        });
         
-        await ctx.editMessageText(getText(lang, 'interestRecorded', {
-            size: sizeText,
-            business: business.name,
-            price: price,
-            time: business.salesTime
-        }));
+        // Create keyboard with back to menu button
+        const keyboard = Markup.inlineKeyboard([
+            [Markup.button.callback(getText(lang, 'backToMenu'), 'back_to_main')]
+        ]);
+        
+        await ctx.answerCbQuery();
+        await ctx.editMessageText(confirmationMessage, keyboard);
         
     } catch (error) {
         console.error('Interest creation error:', error);
