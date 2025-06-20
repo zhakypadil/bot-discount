@@ -222,8 +222,14 @@ async function handleCustomerMenu(ctx, lang) {
 async function handleHelpCallback(ctx) {
     const lang = ctx.session?.language || 'en';
     
+    const keyboard = Markup.inlineKeyboard([
+        [
+            Markup.button.callback(getText(lang, 'backToMenu'), 'back_to_main')
+        ]
+    ]);
+    
     await ctx.answerCbQuery();
-    await ctx.editMessageText(getText(lang, 'helpInfo'));
+    await ctx.editMessageText(getText(lang, 'helpInfo'), keyboard);
 }
 
 // Back to main menu callback
